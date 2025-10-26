@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Welcome, {{ user.username }}!</h2>
+        <p class="text-muted">Your plant disease detection dashboard</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-camera fa-3x text-primary mb-3"></i>
+                <h5>Detect Disease</h5>
+                <p>Upload a new image for analysis</p>
+                <a href="{% url 'detect' %}" class="btn btn-primary">Start Detection</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-history fa-3x text-info mb-3"></i>
+                <h5>View History</h5>
+                <p>Check your previous detections</p>
+                <a href="{% url 'history' %}" class="btn btn-info">View History</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                <h5>Statistics</h5>
+                <p>{{ history.count }} total detections</p>
+                <span class="badge bg-success">Active</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if history %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h4>Recent Detections</h4>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Disease</th>
+                        <th>Confidence</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                    <tr>
+                        <td>{{ item.created_at|date:"M d, Y" }}</td>
+                        <td>{{ item.predicted_disease }}</td>
+                        <td>{{ item.confidence|floatformat:1 }}%</td>
+                        <td>
+                            {% if item.predicted_disease == 'Healthy' %}
+                                <span class="badge bg-success">Healthy</span>
+                            {% else %}
+                                <span class="badge bg-warning">Disease Detected</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

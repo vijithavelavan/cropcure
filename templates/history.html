@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Detection History</h2>
+        <p class="text-muted">Your previous disease detection results</p>
+    </div>
+</div>
+
+{% if history %}
+<div class="row mt-4">
+    {% for item in history %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <img src="{{ item.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+                <h6 class="card-title">{{ item.predicted_disease }}</h6>
+                <p class="card-text">
+                    <small class="text-muted">{{ item.created_at|date:"M d, Y H:i" }}</small><br>
+                    <strong>Confidence:</strong> {{ item.confidence|floatformat:1 }}%
+                </p>
+                <button class="btn btn-sm btn-outline-primary" onclick="showDetails({{ item.id }})">
+                    View Details
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for details -->
+    <div class="modal fade" id="modal{{ item.id }}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ item.predicted_disease }} - Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img src="{{ item.image.url }}" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Disease:</strong> {{ item.predicted_disease }}</p>
+                            <p><strong>Confidence:</strong> {{ item.confidence|floatformat:1 }}%</p>
+                            <p><strong>Date:</strong> {{ item.created_at|date:"M d, Y H:i" }}</p>
+                            <hr>
+                            <h6>Symptoms:</h6>
+                            <p>{{ item.symptoms }}</p>
+                            <h6>Treatment:</h6>
+                            <p>{{ item.treatment }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <div class="card">
+            <div class="card-body">
+                <i class="fas fa-camera fa-3x text-muted mb-3"></i>
+                <h5>No Detection History</h5>
+                <p class="text-muted">You haven't performed any disease detections yet.</p>
+                <a href="{% url 'detect' %}" class="btn btn-primary">Start Detection</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showDetails(itemId) {
+    const modal = new bootstrap.Modal(document.getElementById('modal' + itemId));
+    modal.show();
+}
+</script>
+{% endblock %}
